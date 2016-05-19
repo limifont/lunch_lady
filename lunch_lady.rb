@@ -64,6 +64,10 @@ class Wallet
 		@balance += amount
 	end
 
+	def subtract_from(amount, main_dish)
+		@balance = @balance - main_dish[:price]
+	end
+
 	def display
 		puts "Available balance: #{@balance}"
 	end
@@ -160,7 +164,7 @@ def order_menu(order,wallet)
 		puts 'Current Order:'
 		puts 'Main dishes'
 		puts '--------------------------'
-		display_items(order.main_dishes)
+		display_items(order.main_dishes, order, wallet)
 		puts '--------------------------'
 		puts 'Side dishes'		
 		puts '--------------------------'
@@ -169,13 +173,40 @@ def order_menu(order,wallet)
 	end
 end
 
-def display_items(items)
+def display_items(items, order, wallet)
 	number = 1
-	if items == @main_menu_options || items == @side_menu_options
+	if items == @main_menu_options
 		items.each do |item|
 			puts "#{number}" + ". " + item[:name] + ('.' * (30 - item[:name].length)) + item[:price]
 			number += 1
 		end
+		case gets.strip
+		when '1'
+			order.add_main(@main_menu_options[0])
+			wallet.subtract_from(@main_menu_options[0])
+			order_menu(order, wallet)
+		when '2'
+			order.add_main(@main_menu_options[1])
+			wallet.subtract_from(@main_menu_options[1])
+			order_menu(order, wallet)
+		end
+
+	elsif items == @side_menu_options
+		items.each do |item|
+			puts "#{number}" + ". " + item[:name] + ('.' * (30 - item[:name].length)) + item[:price]
+			number += 1
+		end
+		case gets.strip
+		when '1'
+			order.add_main(@side_menu_options[0])
+			wallet.subtract_from(@side_menu_options[0])
+			order_menu(order, wallet)
+		when '2'
+			order.add_main(@side_menu_options[1])
+			wallet.subtract_from(@side_menu_options[1])
+			order_menu(order, wallet)
+		end	
+
 	elsif items == @main_dishes || items == @side_dishes
 		items.each do |item|
 			puts "#{number}" + ". " + item[:name]
